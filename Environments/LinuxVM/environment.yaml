@@ -5,7 +5,7 @@ description: Deploys an Ubuntu VM and outputs SSH command
 runner: Bicep
 templatePath: main.bicep
 parameters:
-  - id: adminUsername
+ - id: adminUsername
     name: Admin Username
     type: string
     default: azureuser
