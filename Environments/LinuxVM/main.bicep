@@ -1,23 +1,27 @@
 param adminUsername string = 'azureuser'
 param location string = resourceGroup().location
 
-var vmName = 'ade-vm-${uniqueString(resourceGroup().id)}'
+var vmName = 'adevm${uniqueString(resourceGroup().id)}'
+var pipName = '${vmName}-pip'
+var nsgName = '${vmName}-nsg'
+var vnetName = '${vmName}-vnet'
+var nicName = '${vmName}-nic'
+var adminPassword = uniqueString(resourceGroup().id, vmName)
 
-@secure()
-param adminPassword string = newGuid()
-
-resource publicIP 'Microsoft.Network/publicIPAddresses@2023-04-01' = {
-  name: '${vmName}-pip'
+resource pip 'Microsoft.Network/publicIPAddresses@2022-01-01' = {
+  name: pipName
   location: location
   sku: { name: 'Basic' }
   properties: {
     publicIPAllocationMethod: 'Dynamic'
-    dnsSettings: { domainNameLabel: toLower(vmName) }
+    dnsSettings: {
+      domainNameLabel: vmName
+    }
   }
 }
 
-resource nsg 'Microsoft.Network/networkSecurityGroups@2023-04-01' = {
-  name: '${vmName}-nsg'
+resource nsg 'Microsoft.Network/networkSecurityGroups@2022-01-01' = {
+  name: nsgName
   location: location
   properties: {
     securityRules: [
@@ -38,8 +42,8 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2023-04-01' = {
   }
 }
 
-resource vnet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
-  name: '${vmName}-vnet'
+resource vnet 'Microsoft.Network/virtualNetworks@2022-01-01' = {
+  name: vnetName
   location: location
   properties: {
     addressSpace: { addressPrefixes: ['10.0.0.0/16'] }
@@ -55,8 +59,8 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
   }
 }
 
-resource nic 'Microsoft.Network/networkInterfaces@2023-04-01' = {
-  name: '${vmName}-nic'
+resource nic 'Microsoft.Network/networkInterfaces@2022-01-01' = {
+  name: nicName
   location: location
   properties: {
     ipConfigurations: [
@@ -65,14 +69,14 @@ resource nic 'Microsoft.Network/networkInterfaces@2023-04-01' = {
         properties: {
           subnet: { id: vnet.properties.subnets[0].id }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: { id: publicIP.id }
+          publicIPAddress: { id: pip.id }
         }
       }
     ]
   }
 }
 
-resource vm 'Microsoft.Compute/virtualMachines@2023-07-01' = {
+resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   name: vmName
   location: location
   properties: {
@@ -100,10 +104,4 @@ python3 -c "print('Hello World from Azure VM!')" > /tmp/hello_output.txt
       }
     }
     networkProfile: {
-      networkInterfaces: [{ id: nic.id }]
-    }
-  }
-}
-
-output sshCommand string = 'ssh ${adminUsername}@${publicIP.properties.dnsSettings.fqdn}'
-output adminPassword string = adminPassword
+      networkInterfaces: [{ id:
