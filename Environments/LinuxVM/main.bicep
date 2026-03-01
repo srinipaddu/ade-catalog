@@ -12,10 +12,10 @@ resource pip 'Microsoft.Network/publicIPAddresses@2022-01-01' = {
   name: pipName
   location: location
   sku: {
-    name: 'Basic'
+    name: 'Standard'
   }
   properties: {
-    publicIPAllocationMethod: 'Dynamic'
+    publicIPAllocationMethod: 'Static'
     dnsSettings: {
       domainNameLabel: vmName
     }
