@@ -6,7 +6,7 @@ var pipName = '${vmName}-pip'
 var nsgName = '${vmName}-nsg'
 var vnetName = '${vmName}-vnet'
 var nicName = '${vmName}-nic'
-var adminPassword = uniqueString(resourceGroup().id, vmName)
+var adminPassword = 'AdeP@ss${uniqueString(resourceGroup().id, vmName)}'
 
 resource pip 'Microsoft.Network/publicIPAddresses@2022-01-01' = {
   name: pipName
