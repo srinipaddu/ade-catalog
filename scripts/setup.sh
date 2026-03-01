@@ -96,6 +96,30 @@ success "Subscription info fetched"
 # STEP 2 — Resource Group
 # ─────────────────────────────────────────────
 step "2" "Creating Resource Group: $RG in $LOCATION"
+
+# Wait for any existing RG with same name to finish deleting
+MAX_WAIT=300  # 5 minutes max
+WAITED=0
+while true; do
+  STATE=$(az group show --name $RG --query "properties.provisioningState" -o tsv 2>/dev/null) || STATE="Gone"
+  if [ "$STATE" == "Gone" ] || [ -z "$STATE" ]; then
+    log "No existing RG found — safe to create"
+    break
+  elif [ "$STATE" == "Deleting" ]; then
+    if [ $WAITED -ge $MAX_WAIT ]; then
+      error "Timed out waiting for RG '$RG' to finish deleting after ${MAX_WAIT}s"
+    fi
+    warn "RG '$RG' is still deleting... waiting 15s (${WAITED}s elapsed)"
+    sleep 15
+    WAITED=$((WAITED + 15))
+  else
+    warn "RG '$RG' exists with state: $STATE — deleting it first..."
+    az group delete --name $RG --yes --no-wait --output none
+    sleep 15
+    WAITED=$((WAITED + 15))
+  fi
+done
+
 az group create --name $RG --location $LOCATION --output none
 success "Resource group '$RG' created"
 
