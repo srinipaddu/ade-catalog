@@ -18,7 +18,7 @@ ENV_TYPE="Dev"
 CATALOG_NAME="my-catalog"
 ENV_NAME="my-dev-vm"
 GITHUB_REPO="https://github.com/srinipaddu/ade-catalog.git"
-GITHUB_PAT="YOUR_GITHUB_PAT_HERE"
+GITHUB_PAT="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"
 ADMIN_USERNAME="azureuser"
 VM_SIZE="Standard_D2s_v3"
 
