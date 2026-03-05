@@ -17,7 +17,7 @@ apt-get install -y python3 git
 git clone -b BRANCH_NAME https://github.com/srinipaddu/ade-catalog.git /app
 
 # Replace branch placeholder in hello.py
-sed -i "s/BRANCH_PLACEHOLDER/BRANCH_NAME/g" /app/src/hello.py
+sed -i "s|BRANCH_PLACEHOLDER|BRANCH_NAME|g" /app/src/hello.py
 
 # Run Hello World from branch code
 python3 /app/src/hello.py > /tmp/hello_output.txt 2>&1
